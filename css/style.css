@@ -1,2 +1,8 @@
 /* Kristen Vincent's D3 coordinated viz style.css */
 
+.counties {
+	fill: #FFF;
+	stroke: #CCC;
+	stroke-width: 2px;
+}
+
