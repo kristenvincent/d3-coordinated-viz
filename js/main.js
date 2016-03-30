@@ -4,7 +4,8 @@
 //generators?
 //domain-input
 //range-output
-//on Lesson 2.II example 2.5 setting bar heights
+//on Lesson 2.III
+//make bars grey on graph
 
 //wrap everything in a self-exectuing anonymous function to move to local scope
 (function() {
@@ -145,7 +146,7 @@ function choropleth(props, colorScale) {
 	if (val && val != NaN) {
 		return colorScale(val);
 	} else {
-		return "#CCC";
+		return "grey";
 	};
 };
 
@@ -162,11 +163,19 @@ function setChart(csvData, colorScale) {
 		.attr("height", chartHeight)
 		.attr("class", "chart");
 
+	//create a scale to size bars proportionally to frame
+	var yScale = d3.scale.linear()
+		.range([0, chartHeight])
+		.domain([0, 105]);
+
 	//set bars for each county
 	var bars = chart.selectAll(".bars")
 		.data(csvData)
 		.enter()
 		.append("rect")
+		.sort(function(a, b){
+			return b[expressed]-a[expressed]
+		})
 		.attr("class", function(d) {
 			return "bars " + d.COUNTY_FIP;
 		})
@@ -174,8 +183,15 @@ function setChart(csvData, colorScale) {
 		.attr("x", function(d, i) {
 			return i * (chartWidth / csvData.length);
 		})
-		.attr("height", 600)
-		.attr("y", 0);
+		.attr("height", function(d) {
+			return yScale(parseFloat(d[expressed]));
+		})
+		.attr("y", function(d) {
+			return chartHeight - yScale(parseFloat(d[expressed]));
+		})
+		.style ("fill", function(d) {
+			return choropleth(d, colorScale);
+		});
 };
 
 })(); //end of main.js
