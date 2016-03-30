@@ -2,7 +2,9 @@
 
 //code in color scale??
 //generators?
-//on 1.IV
+//domain-input
+//range-output
+//on Lesson 2.II example 2.5 setting bar heights
 
 //wrap everything in a self-exectuing anonymous function to move to local scope
 (function() {
@@ -17,8 +19,8 @@ window.onload = setMap();
 //set up choropleth map
 function setMap() {
 	//map frame dimensions
-	var width = 960,
-		height = 760;
+	var width = window.innerWidth * 0.5,
+		height = 600;
 
 	//create new svg container for the map
 	var map = d3.select("body")
@@ -59,6 +61,9 @@ function setMap() {
 
 		//add enumeration units to the map
 		setEnumerationUnits(wisconsinCounties, map, path, colorScale);
+
+		//add coordinated visualization to the map
+		setChart(csvData, colorScale);
 	};
 }; //end of setMap()
 
@@ -90,16 +95,19 @@ function joinData(wisconsinCounties, csvData) {
 }; //end of joinData function
 
 //function to select counties
-function setEnumerationUnits(wisconsinCounties, map, path) {
+function setEnumerationUnits(wisconsinCounties, map, path, colorScale) {
 //add county boundaries to the map
 	var counties = map.selectAll(".counties")
 		.data(wisconsinCounties)
 		.enter()
 		.append("path")
-		.attr("class", function(d){
+		.attr("class", function(d) {
 			return d.properties.COUNTY_FIP;
 		})
-		.attr("d", path);
+		.attr("d", path)
+		.style("fill", function(d) {
+			return choropleth(d.properties, colorScale);
+		});
 }; //end of setEnumerationUnits function
 
 //function to create color scale generator
@@ -129,6 +137,46 @@ function makeColorScale(data) {
 	return colorScale;
 };
 
+//function to make null values grey on the map
+function choropleth(props, colorScale) {
+	//make sure attribute value is a number
+	var val = parseFloat(props[expressed]);
+	//if attribute value exists, assign a color; otherwise assign gray
+	if (val && val != NaN) {
+		return colorScale(val);
+	} else {
+		return "#CCC";
+	};
+};
+
+//function to create coordinated bar graph
+function setChart(csvData, colorScale) {
+	//chart frame dimensions
+	var chartWidth = window.innerWidth * 0.425,
+		chartHeight = 600;
+
+	//create a second svg element to hold the bar chart
+	var chart = d3.select("body")
+		.append("svg")
+		.attr("width", chartWidth)
+		.attr("height", chartHeight)
+		.attr("class", "chart");
+
+	//set bars for each county
+	var bars = chart.selectAll(".bars")
+		.data(csvData)
+		.enter()
+		.append("rect")
+		.attr("class", function(d) {
+			return "bars " + d.COUNTY_FIP;
+		})
+		.attr("width", chartWidth / csvData.length - 1)
+		.attr("x", function(d, i) {
+			return i * (chartWidth / csvData.length);
+		})
+		.attr("height", 600)
+		.attr("y", 0);
+};
 
 })(); //end of main.js
 
