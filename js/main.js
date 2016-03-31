@@ -4,8 +4,9 @@
 //generators?
 //domain-input
 //range-output
-//on Lesson 2.III
+//bar numbers
 //make bars grey on graph
+//on Lesson 2.III example 2.10 chart title
 
 //wrap everything in a self-exectuing anonymous function to move to local scope
 (function() {
@@ -20,7 +21,7 @@ window.onload = setMap();
 //set up choropleth map
 function setMap() {
 	//map frame dimensions
-	var width = window.innerWidth * 0.5,
+	var width = window.innerWidth * 0.425,
 		height = 600;
 
 	//create new svg container for the map
@@ -153,7 +154,7 @@ function choropleth(props, colorScale) {
 //function to create coordinated bar graph
 function setChart(csvData, colorScale) {
 	//chart frame dimensions
-	var chartWidth = window.innerWidth * 0.425,
+	var chartWidth = window.innerWidth * 0.5,
 		chartHeight = 600;
 
 	//create a second svg element to hold the bar chart
@@ -166,7 +167,7 @@ function setChart(csvData, colorScale) {
 	//create a scale to size bars proportionally to frame
 	var yScale = d3.scale.linear()
 		.range([0, chartHeight])
-		.domain([0, 105]);
+		.domain([0, 45]);
 
 	//set bars for each county
 	var bars = chart.selectAll(".bars")
@@ -192,6 +193,29 @@ function setChart(csvData, colorScale) {
 		.style ("fill", function(d) {
 			return choropleth(d, colorScale);
 		});
+
+	//annotate bars with attribute value text
+	var numbers = chart.selectAll(".numbers")
+		.data(csvData)
+		.enter()
+		.append("text")
+		.sort(function(a, b) {
+			return b[expressed]-a[expressed]
+		})
+		.attr("class", function(d) {
+			return "numbers " + d.COUNTY_FIP;
+		})
+		.attr("text-anchor", "middle")
+		.attr("x", function(d, i) {
+			var fraction = chartWidth / csvData.length;
+			return i * fraction + (fraction - 1) / 2;
+		})
+		.attr("y", function(d) {
+			return chartHeight - yScale(parseFloat(d[expressed])) + 15;
+		})
+		.text(function(d){
+			return Math.round(d[expressed]*100)/100
+		})
 };
 
 })(); //end of main.js
