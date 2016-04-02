@@ -14,6 +14,8 @@
 //pseudo-global variables
 var attrArray = ["Percent Of Farms With Milk Cows", "How Much Each Cow Is Worth_thousandsofdollarseachcowproducesinayear", "Cows Per Capita", "Active Selling Dairy Farms Per Capita", "Total Farms Per Capita"]; //list of attributes
 var expressed = attrArray[0]; //initial attribute
+var colorScale;
+
 
 //begin script when window loads
 window.onload = setMap();
@@ -115,15 +117,15 @@ function setEnumerationUnits(wisconsinCounties, map, path, colorScale) {
 //function to create color scale generator
 function makeColorScale(data) {
 	var colorClasses = [
-		"#f1eef6",
-		"#d7b5d8",
-		"#df65b0",
-		"#dd1c77",
-		"#980043"
+		"#f7f7f7",
+		"#cccccc",
+		"#969696",
+		"#636363",
+		"#252525"
 	];
 
 	//create color scale generator
-	var colorScale = d3.scale.quantile()
+	colorScale = d3.scale.quantile()
 		.range(colorClasses);
 
 	//build array of all values of the expressed attribute
@@ -147,76 +149,147 @@ function choropleth(props, colorScale) {
 	if (val && val != NaN) {
 		return colorScale(val);
 	} else {
-		return "grey";
+		return "yellow";
 	};
 };
 
 //function to create coordinated bar graph
 function setChart(csvData, colorScale) {
 	//chart frame dimensions
-	var chartWidth = window.innerWidth * 0.5,
-		chartHeight = 600;
+	var width = window.innerWidth * 0.5,
+		height = 600;
 
-	//create a second svg element to hold the bar chart
-	var chart = d3.select("body")
-		.append("svg")
-		.attr("width", chartWidth)
-		.attr("height", chartHeight)
+	var chart = d3.select("body").append("svg")
+		.attr("width", width)
+		.attr("height", height)
 		.attr("class", "chart");
 
-	//create a scale to size bars proportionally to frame
-	var yScale = d3.scale.linear()
-		.range([0, chartHeight])
-		.domain([0, 45]);
+	// var g = svg.append("g");
 
-	//set bars for each county
-	var bars = chart.selectAll(".bars")
+	//append image to the chart, one cow image per county
+	var cowChart = chart.selectAll(".chart")
 		.data(csvData)
 		.enter()
-		.append("rect")
-		.sort(function(a, b){
-			return b[expressed]-a[expressed]
-		})
-		.attr("class", function(d) {
-			return "bars " + d.COUNTY_FIP;
-		})
-		.attr("width", chartWidth / csvData.length - 1)
-		.attr("x", function(d, i) {
-			return i * (chartWidth / csvData.length);
-		})
-		.attr("height", function(d) {
-			return yScale(parseFloat(d[expressed]));
-		})
-		.attr("y", function(d) {
-			return chartHeight - yScale(parseFloat(d[expressed]));
-		})
-		.style ("fill", function(d) {
-			return choropleth(d, colorScale);
-		});
+		.append("svg:image")
+		.attr("xlink:href", "assets/cow-01.svg")
+		// .attr("width", 200)
+	 //    .attr("height", 200)
+	    .attr("x", 228)
+	    .attr("y",53)
+	    .attr("class", function (d) {
+	    	return "cow " + d.COUNTY_FIP;
+	    })
+	    .attr("width", 75)
+	    .attr("height", 75);
 
-	//annotate bars with attribute value text
-	var numbers = chart.selectAll(".numbers")
-		.data(csvData)
-		.enter()
-		.append("text")
-		.sort(function(a, b) {
-			return b[expressed]-a[expressed]
-		})
-		.attr("class", function(d) {
-			return "numbers " + d.COUNTY_FIP;
-		})
-		.attr("text-anchor", "middle")
-		.attr("x", function(d, i) {
-			var fraction = chartWidth / csvData.length;
-			return i * fraction + (fraction - 1) / 2;
-		})
-		.attr("y", function(d) {
-			return chartHeight - yScale(parseFloat(d[expressed])) + 15;
-		})
-		.text(function(d){
-			return Math.round(d[expressed]*100)/100
-		})
+	 updateChart(cowChart, csvData.length, csvData);
 };
+
+//function to update chart 
+function updateChart(cowChart, countySquares, csvData) {
+	
+	var xValue = 0;
+	var yValue = 0;
+	var colorArray = [];
+
+	
+
+	var countyColor = cowChart.style("fill", function (d) {
+			return choropleth(d, colorScale);
+	})
+	.attr("x", function (d, i) {
+		color = choropleth (d, colorScale);
+		//loop to arrange chart horizontally
+		for (i = 0; i < colorArray.length; i++) {
+			if(colorArray[i].color == color) {
+				xValue = colorArray[i].count*(10 + 1);
+				colorArray[i].count+=1;
+			}
+			if (color == "yellow" || color == undefined) {
+				xValue = -100000;
+			}
+		}
+		return xValue;
+	})
+	// .attr("y", function(d, i) {
+	// 	color = choropleth(d, colorScale);
+	// 	if (color == )
+	// })
+
+
+};
+
+
+	// var img = g.append("svg:image")
+	// 	.attr("xlink:href", "assets/cow-01.svg")
+	// 	.attr("width", 200)
+	//     .attr("height", 200)
+	//     .attr("x", 228)
+	//     .attr("y",53);
+
+	
+	  
+	//create a second svg element to hold the bar chart
+// 	var chart = d3.select("body")
+// 		.append("svg")
+// 		.attr("width", chartWidth)
+// 		.attr("height", chartHeight)
+// 		.attr("class", "chart");
+
+// 	//create a scale to size bars proportionally to frame
+// 	var yScale = d3.scale.linear()
+// 		.range([0, chartHeight])
+// 		.domain([0, 45]);
+
+// 	//set bars for each county
+// 	var bars = chart.selectAll(".bars")
+// 		.data(csvData)
+// 		.enter()
+// 		.append("rect")
+// 		.sort(function(a, b){
+// 			return b[expressed]-a[expressed]
+// 		})
+// 		.attr("class", function(d) {
+// 			return "bars " + d.COUNTY_FIP;
+// 		})
+// 		.attr("width", chartWidth / csvData.length - 1)
+// 		.attr("x", function(d, i) {
+// 			return i * (chartWidth / csvData.length);
+// 		})
+// 		.attr("height", function(d) {
+// 			return yScale(parseFloat(d[expressed]));
+// 		})
+// 		.attr("y", function(d) {
+// 			return chartHeight - yScale(parseFloat(d[expressed]));
+// 		})
+// 		.style ("fill", function(d) {
+// 			return choropleth(d, colorScale);
+// 		});
+
+// 	//annotate bars with attribute value text
+// 	var numbers = chart.selectAll(".numbers")
+// 		.data(csvData)
+// 		.enter()
+// 		.append("text")
+// 		.sort(function(a, b) {
+// 			return b[expressed]-a[expressed]
+// 		})
+// 		.attr("class", function(d) {
+// 			return "numbers " + d.COUNTY_FIP;
+// 		})
+// 		.attr("text-anchor", "middle")
+// 		.attr("x", function(d, i) {
+// 			var fraction = chartWidth / csvData.length;
+// 			return i * fraction + (fraction - 1) / 2;
+// 		})
+// 		.attr("y", function(d) {
+// 			return chartHeight - yScale(parseFloat(d[expressed])) + 15;
+// 		})
+// 		.text(function(d){
+// 			return Math.round(d[expressed]*100)/100
+// 		})
+	
+
 
 })(); //end of main.js
 
