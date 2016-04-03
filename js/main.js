@@ -1,11 +1,14 @@
 /* Kristen Vincent's D3 coordinated viz main.js */
 
+//COLOR BOTTLES BASED ON CHOROPLETH COLOR?
+//DO I HAVE TO ANNOTATE or axis MINE IF THEY ARE COUNTS?
+//TITLE
+
 //code in color scale??
 //generators?
+
 //domain-input
 //range-output
-//bar numbers
-//make bars grey on graph
 //on Lesson 2.III example 2.10 chart title
 
 //wrap everything in a self-exectuing anonymous function to move to local scope
@@ -15,6 +18,14 @@
 var attrArray = ["Percent Of Farms With Milk Cows", "How Much Each Cow Is Worth_thousandsofdollarseachcowproducesinayear", "Cows Per Capita", "Active Selling Dairy Farms Per Capita", "Total Farms Per Capita"]; //list of attributes
 var expressed = attrArray[0]; //initial attribute
 var colorScale;
+//var colorClasses = [];
+var colorClasses = [
+		"#f7f7f7",
+		"#cccccc",
+		"#969696",
+		"#636363",
+		"#252525"
+	];
 
 
 //begin script when window loads
@@ -32,6 +43,11 @@ function setMap() {
 		.attr("class", "map")
 		.attr("width", width)
 		.attr("height", height);
+	
+	// map.append("svg:image")
+	// 	.attr("xlink:href", "assets/cow2-01.svg")
+	// 	.attr("x", 228)
+	//     .attr("y",53);
 
 	//create projection
 	var projection = d3.geo.albers()
@@ -149,7 +165,7 @@ function choropleth(props, colorScale) {
 	if (val && val != NaN) {
 		return colorScale(val);
 	} else {
-		return "yellow";
+		return "pink";
 	};
 };
 
@@ -171,7 +187,7 @@ function setChart(csvData, colorScale) {
 		.data(csvData)
 		.enter()
 		.append("svg:image")
-		.attr("xlink:href", "assets/cow-01.svg")
+		.attr("xlink:href", "assets/bottle-01.svg")
 		// .attr("width", 200)
 	 //    .attr("height", 200)
 	    .attr("x", 228)
@@ -179,18 +195,31 @@ function setChart(csvData, colorScale) {
 	    .attr("class", function (d) {
 	    	return "cow " + d.COUNTY_FIP;
 	    })
-	    .attr("width", 75)
-	    .attr("height", 75);
+	    .attr("width", 50)
+	    .attr("height", 50);
+
+	 var chartTitle = chart.append("text")
+	 	.attr("x", 20)
+	 	.attr("y", 40)
+	 	.attr("class", "chartTitle")
+	 	.text("Dairy in Wisconsin");
 
 	 updateChart(cowChart, csvData.length, csvData);
 };
 
 //function to update chart 
 function updateChart(cowChart, countySquares, csvData) {
-	
+	colorScale = makeColorScale(csvData);
 	var xValue = 0;
 	var yValue = 0;
 	var colorArray = [];
+	var height = 50;
+	var width = 50;
+
+	for (i = 0; i < colorClasses.length; i++) {
+		var colorObject = {"color": colorClasses[i], "count":0};
+		colorArray.push(colorObject);
+	}
 
 	
 
@@ -202,21 +231,31 @@ function updateChart(cowChart, countySquares, csvData) {
 		//loop to arrange chart horizontally
 		for (i = 0; i < colorArray.length; i++) {
 			if(colorArray[i].color == color) {
-				xValue = colorArray[i].count*(10 + 1);
+				xValue = colorArray[i].count*(30 + 1);
 				colorArray[i].count+=1;
 			}
-			if (color == "yellow" || color == undefined) {
+			if (color == "pink" || color == undefined) {
 				xValue = -100000;
 			}
 		}
 		return xValue;
 	})
-	// .attr("y", function(d, i) {
-	// 	color = choropleth(d, colorScale);
-	// 	if (color == )
-	// })
-
-
+	.attr("y", function(d, i) {
+		color = choropleth(d, colorScale);
+		if (color == colorClasses[0]) {
+				return 0
+			} else if (color == colorClasses[1]) {
+				return (height+1);
+			} else if (color == colorClasses[2]) {
+				return (height+1)*2;
+			} else if (color == colorClasses[3]) {
+				return (height+1)*3;
+			} else if (color == colorClasses[4]) {
+				return (height+1)*4;
+			} else if (color == colorClasses[5]) {
+				return (height+1)*5;
+			}
+		})
 };
 
 
