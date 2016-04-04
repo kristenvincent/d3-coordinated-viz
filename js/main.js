@@ -4,9 +4,6 @@
 //DO I HAVE TO ANNOTATE or axis MINE IF THEY ARE COUNTS?
 //TITLE
 
-//code in color scale??
-//generators?
-
 //domain-input
 //range-output
 //on Lesson 2.III example 2.10 chart title
@@ -173,9 +170,9 @@ function choropleth(props, colorScale) {
 function setChart(csvData, colorScale) {
 	//chart frame dimensions
 	var width = window.innerWidth * 0.5,
-		height = 600;
+		height = 525;
 
-	var chart = d3.select("body").append("svg")
+	var chart = d3.select("#chartBottles").append("svg")
 		.attr("width", width)
 		.attr("height", height)
 		.attr("class", "chart");
@@ -198,7 +195,8 @@ function setChart(csvData, colorScale) {
 	    .attr("width", 50)
 	    .attr("height", 50);
 
-	 var chartTitle = chart.append("text")
+
+	 var chartTitle = d3.select("#title").append("text")
 	 	.attr("x", 20)
 	 	.attr("y", 40)
 	 	.attr("class", "chartTitle")
