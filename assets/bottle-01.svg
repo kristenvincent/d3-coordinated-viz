@@ -1,19 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 19.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Layer_1" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns"
-	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-303.5 372.1 50 50"
-	 style="enable-background:new -303.5 372.1 50 50;" xml:space="preserve">
-<style type="text/css">
+<svg xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0" y="0" viewBox="-303.5 372.1 50 50" xml:space="preserve" enable-background="new -303.5 372.1 50 50">
+  <style type="text/css">
+    
+    
 	.st0{fill:#727272;}
-</style>
-<g sketch:type="MSPage">
-	<g sketch:type="MSLayerGroup">
-		<path sketch:type="MSShapeGroup" class="st0" d="M-273.1,420.4h-10.8c-2.6,0-4.7-2.1-4.7-4.7v-15c0-2.9,0.7-5.9,2-8.5l0.6-1.3
-			c1.2-2.4,1.8-5.1,1.8-7.8v-3.9h11.3v3.9c0,2.7,0.6,5.4,1.8,7.8l0.6,1.3c1.3,2.6,2,5.6,2,8.5v15
-			C-268.4,418.3-270.5,420.4-273.1,420.4L-273.1,420.4z M-282.6,380.6v2.4c0,2.9-0.7,5.9-2,8.5l-0.6,1.3c-1.2,2.4-1.8,5.1-1.8,7.8
-			v15c0,1.8,1.4,3.2,3.2,3.2h10.8c1.8,0,3.2-1.4,3.2-3.2v-15c0-2.7-0.6-5.4-1.8-7.8l-0.6-1.3c-1.3-2.6-2-5.6-2-8.5v-2.4H-282.6
-			L-282.6,380.6z"/>
-		<path sketch:type="MSShapeGroup" class="st0" d="M-286.4,376.1h15.8v4.5h-15.8V376.1z M-284.9,379.1h12.8v-1.5h-12.8V379.1z"/>
-	</g>
-</g>
+
+  
+  </style>
+  <g sketch:type="MSPage">
+    <g sketch:type="MSLayerGroup">
+      <path sketch:type="MSShapeGroup" class="st0" d="M-273.1 420.4h-10.8c-2.6 0-4.7-2.1-4.7-4.7v-15c0-2.9 0.7-5.9 2-8.5l0.6-1.3c1.2-2.4 1.8-5.1 1.8-7.8v-3.9h11.3v3.9c0 2.7 0.6 5.4 1.8 7.8l0.6 1.3c1.3 2.6 2 5.6 2 8.5v15C-268.4 418.3-270.5 420.4-273.1 420.4L-273.1 420.4zM-282.6 380.6v2.4c0 2.9-0.7 5.9-2 8.5l-0.6 1.3c-1.2 2.4-1.8 5.1-1.8 7.8v15c0 1.8 1.4 3.2 3.2 3.2h10.8c1.8 0 3.2-1.4 3.2-3.2v-15c0-2.7-0.6-5.4-1.8-7.8l-0.6-1.3c-1.3-2.6-2-5.6-2-8.5v-2.4H-282.6L-282.6 380.6z"/>
+      <path sketch:type="MSShapeGroup" class="st0" d="M-286.4 376.1h15.8v4.5h-15.8V376.1zM-284.9 379.1h12.8v-1.5h-12.8V379.1z"/>
+    </g>
+  </g>
 </svg>

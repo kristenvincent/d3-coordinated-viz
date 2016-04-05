@@ -183,17 +183,18 @@ function setChart(csvData, colorScale) {
 	var cowChart = chart.selectAll(".chart")
 		.data(csvData)
 		.enter()
-		.append("svg:image")
-		.attr("xlink:href", "assets/bottle-01.svg")
-		// .attr("width", 200)
-	 //    .attr("height", 200)
+		.append("rect")
+		//.append("svg:image")
+		//.attr("xlink:href", "assets/bottle-01.svg")
+		//.attr("width", 200)
+	 	//.attr("height", 200)
 	    .attr("x", 228)
 	    .attr("y",53)
 	    .attr("class", function (d) {
 	    	return "cow " + d.COUNTY_FIP;
 	    })
-	    .attr("width", 50)
-	    .attr("height", 50);
+	    .attr("width", 30) //50)
+	    .attr("height", 30); //50) 
 
 
 	 var chartTitle = d3.select("#title").append("text")
@@ -219,7 +220,6 @@ function updateChart(cowChart, countySquares, csvData) {
 		colorArray.push(colorObject);
 	}
 
-	
 
 	var countyColor = cowChart.style("fill", function (d) {
 			return choropleth(d, colorScale);
@@ -229,7 +229,7 @@ function updateChart(cowChart, countySquares, csvData) {
 		//loop to arrange chart horizontally
 		for (i = 0; i < colorArray.length; i++) {
 			if(colorArray[i].color == color) {
-				xValue = colorArray[i].count*(30 + 1);
+				xValue = colorArray[i].count*(30 + 2);//50 + 1);
 				colorArray[i].count+=1;
 			}
 			if (color == "pink" || color == undefined) {
@@ -254,6 +254,7 @@ function updateChart(cowChart, countySquares, csvData) {
 				return (height+1)*5;
 			}
 		})
+	
 };
 
 
