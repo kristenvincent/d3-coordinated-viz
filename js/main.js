@@ -1,12 +1,17 @@
 /* Kristen Vincent's D3 coordinated viz main.js */
 
 //COLOR BOTTLES BASED ON CHOROPLETH COLOR?
-//DO I HAVE TO ANNOTATE or axis MINE IF THEY ARE COUNTS?
 //TITLE
+//DELETE UN-USED CODE FOR FINAL!
+//ADD NAME TO MAP!
+//ADD DATA SOURCES
+//ADD PAGE TITLE AND OTHER INFO!!
+//COMMENT
+//ON LESSON 1.II EXAMPLE 1.5 RESTYLING CHART
 
 //domain-input
 //range-output
-//on Lesson 2.III example 2.10 chart title
+
 
 //wrap everything in a self-exectuing anonymous function to move to local scope
 (function() {
@@ -23,7 +28,6 @@ var colorClasses = [
 		"#636363",
 		"#252525"
 	];
-
 
 //begin script when window loads
 window.onload = setMap();
@@ -81,6 +85,11 @@ function setMap() {
 
 		//add coordinated visualization to the map
 		setChart(csvData, colorScale);
+
+		//add dropdown to map
+		createDropdown(csvData);
+
+
 	};
 }; //end of setMap()
 
@@ -119,7 +128,7 @@ function setEnumerationUnits(wisconsinCounties, map, path, colorScale) {
 		.enter()
 		.append("path")
 		.attr("class", function(d) {
-			return d.properties.COUNTY_FIP;
+			return "counties " + d.properties.COUNTY_FIP;
 		})
 		.attr("d", path)
 		.style("fill", function(d) {
@@ -183,9 +192,9 @@ function setChart(csvData, colorScale) {
 	var cowChart = chart.selectAll(".chart")
 		.data(csvData)
 		.enter()
-		//.append("rect")
-		.append("svg:image")
-		.attr("xlink:href", "assets/bottle-01.svg")
+		.append("rect")
+		//.append("svg:image")
+		//.attr("xlink:href", "assets/bottle-01.svg")
 		//.attr("width", 200)
 	 	//.attr("height", 200)
 	    .attr("x", 228)
@@ -193,8 +202,8 @@ function setChart(csvData, colorScale) {
 	    .attr("class", function (d) {
 	    	return "cow " + d.COUNTY_FIP;
 	    })
-	    .attr("width", 30) //50)
-	    .attr("height", 30); //50) 
+	    .attr("width", 50)
+	    .attr("height", 50) 
 
 
 	 var chartTitle = d3.select("#title").append("text")
@@ -229,7 +238,7 @@ function updateChart(cowChart, countySquares, csvData) {
 		//loop to arrange chart horizontally
 		for (i = 0; i < colorArray.length; i++) {
 			if(colorArray[i].color == color) {
-				xValue = colorArray[i].count*(30 + 2);//50 + 1);
+				xValue = colorArray[i].count*(50 + 1);
 				colorArray[i].count+=1;
 			}
 			if (color == "pink" || color == undefined) {
@@ -254,6 +263,50 @@ function updateChart(cowChart, countySquares, csvData) {
 				return (height+1)*5;
 			}
 		})
+	
+};
+
+//function to create a dropdown menu for attribute selection
+function createDropdown (csvData) {
+	//add select element
+	var dropdown = d3.select("body")
+		.append("select")
+		.attr("class", "dropdown")
+		.on("change", function () {
+			changeAttribute(this.value, csvData)
+		});
+
+	//add initial option
+	var titleOption = dropdown.append("option")
+		.attr("class", "titleOption")
+		.attr("disabled", "true")
+		.text("Select Attribute");
+
+	//add addtibute name options
+	var attrOptions = dropdown.selectAll("attrOptions")
+		.data(attrArray)
+		.enter()
+		.append("option")
+		.attr("value", function (d) {return d})
+		.text(function(d) {return d});
+};
+
+//function for dropdown change listener handler
+function changeAttribute(attribute, csvData) {
+	//change the expressed attribute
+	expressed = attribute;
+
+	//recreate teh color scale
+	var colorScale = makeColorScale(csvData);
+	
+
+	//recolor enumeration units
+	var counties = d3.selectAll(".counties")
+		.style("fill", function(d) {
+			return choropleth(d.properties, colorScale)
+		});
+
+	var cowChart = d3.selectAll(".chart");
 	
 };
 
