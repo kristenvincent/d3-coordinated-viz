@@ -1,5 +1,13 @@
 /* Kristen Vincent's D3 coordinated viz main.js */
 
+//PROBLEMS!!!!!!!!!!
+//UPDATE CHART BASED ON SELECTED ATTRIBUTE
+//TITLES FOR CLASS BREAKS
+//HIGHLIGHTING
+//text to svg containing chart
+
+//ON DYNAMIC LABELS
+
 //COLOR BOTTLES BASED ON CHOROPLETH COLOR?
 //TITLE
 //DELETE UN-USED CODE FOR FINAL!
@@ -7,7 +15,8 @@
 //ADD DATA SOURCES
 //ADD PAGE TITLE AND OTHER INFO!!
 //COMMENT
-//ON LESSON 1.II EXAMPLE 1.5 RESTYLING CHART
+//WHAT YEARS???
+
 
 //domain-input
 //range-output
@@ -17,7 +26,7 @@
 (function() {
 
 //pseudo-global variables
-var attrArray = ["Percent Of Farms With Milk Cows", "How Much Each Cow Is Worth_thousandsofdollarseachcowproducesinayear", "Cows Per Capita", "Active Selling Dairy Farms Per Capita", "Total Farms Per Capita"]; //list of attributes
+var attrArray = ["Percent Of Farms With Milk Cows", "Yearly Production Per Cow (Thousands $)", "Cows Per Capita", "Active Selling Dairy Farms Per Capita", "Total Farms Per Capita"]; //list of attributes
 var expressed = attrArray[0]; //initial attribute
 var colorScale;
 //var colorClasses = [];
@@ -55,7 +64,7 @@ function setMap() {
 		.center([0, 44.60])
 		.rotate([90, 0, 0])
 		.parallels([30.64, 44.84])
-		.scale(6500)
+		.scale(6000)
 		.translate([width / 2, height / 2]);
 
 	//create a path generator
@@ -102,8 +111,8 @@ function joinData(wisconsinCounties, csvData) {
 
 		//loop through geojson counties to find correct county
 		for (var a=0; a<wisconsinCounties.length; a++) {
-			var geojsonProps = wisconsinCounties[a].properties; //the current county geojson properties
-			var geojsonKey = geojsonProps.COUNTY_FIP; //the geojson primary key
+			var geojsonprops = wisconsinCounties[a].properties; //the current county geojson properties
+			var geojsonKey = geojsonprops.COUNTY_FIP; //the geojson primary key
 
 			//where primary keys match, transfer csv data to geojson properties object
 			if (geojsonKey == csvKey) {
@@ -111,7 +120,7 @@ function joinData(wisconsinCounties, csvData) {
 				//assign all attributes and values
 				attrArray.forEach(function(attr) {
 					var val = parseFloat(csvCounty[attr]); //get csv attribute value
-					geojsonProps[attr] = val; //assign attribute and value to geojson properties
+					geojsonprops[attr] = val; //assign attribute and value to geojson properties
 				});
 			};
 		};
@@ -127,13 +136,22 @@ function setEnumerationUnits(wisconsinCounties, map, path, colorScale) {
 		.data(wisconsinCounties)
 		.enter()
 		.append("path")
-		.attr("class", function(d) {
+		.attr("class", function(d){
 			return "counties " + d.properties.COUNTY_FIP;
 		})
 		.attr("d", path)
-		.style("fill", function(d) {
+		.style("fill", function(d){
 			return choropleth(d.properties, colorScale);
 		});
+		// .on("mouseover", function(d){
+		// 	highlight(d.properties);
+		// });
+		// .on("mouseout", function(d){
+		// 	dehighlight(d.properties);
+		// });
+
+	var desc = counties.append("desc")
+		.text('{"fill": "yellow"}');
 }; //end of setEnumerationUnits function
 
 //function to create color scale generator
@@ -167,24 +185,28 @@ function makeColorScale(data) {
 function choropleth(props, colorScale) {
 	//make sure attribute value is a number
 	var val = parseFloat(props[expressed]);
-	//if attribute value exists, assign a color; otherwise assign gray
-	if (val && val != NaN) {
+	//if attribute value exists, assign a color; otherwise assign pink
+	if (val) {
 		return colorScale(val);
+	} else if (val == "No data") {
+		return "pink";
 	} else {
 		return "pink";
-	};
+	}
+	
 };
 
 //function to create coordinated bar graph
 function setChart(csvData, colorScale) {
 	//chart frame dimensions
-	var width = window.innerWidth * 0.5,
-		height = 525;
+	var width = window.innerWidth * 0.50,
+		height = 455;
 
 	var chart = d3.select("#chartBottles").append("svg")
 		.attr("width", width)
 		.attr("height", height)
 		.attr("class", "chart");
+
 
 	// var g = svg.append("g");
 
@@ -202,15 +224,13 @@ function setChart(csvData, colorScale) {
 	    .attr("class", function (d) {
 	    	return "cow " + d.COUNTY_FIP;
 	    })
-	    .attr("width", 50)
-	    .attr("height", 50) 
+	    .attr("width", 40)
+	    .attr("height", 40) 
+	    //.on("mouseover", highlight)
+	    //.on("mouseout", dehighlight);
 
-
-	 var chartTitle = d3.select("#title").append("text")
-	 	.attr("x", 20)
-	 	.attr("y", 40)
-	 	.attr("class", "chartTitle")
-	 	.text("Dairy in Wisconsin");
+	 var desc = cowChart.append("desc")
+	 	.text('{"fill": "none"}');
 
 	 updateChart(cowChart, csvData.length, csvData);
 };
@@ -221,8 +241,8 @@ function updateChart(cowChart, countySquares, csvData) {
 	var xValue = 0;
 	var yValue = 0;
 	var colorArray = [];
-	var height = 50;
-	var width = 50;
+	var height = 40;
+	var width = 40;
 
 	for (i = 0; i < colorClasses.length; i++) {
 		var colorObject = {"color": colorClasses[i], "count":0};
@@ -238,12 +258,12 @@ function updateChart(cowChart, countySquares, csvData) {
 		//loop to arrange chart horizontally
 		for (i = 0; i < colorArray.length; i++) {
 			if(colorArray[i].color == color) {
-				xValue = colorArray[i].count*(50 + 1);
+				xValue = colorArray[i].count*(40 + 1);
 				colorArray[i].count+=1;
 			}
-			if (color == "pink" || color == undefined) {
-				xValue = -100000;
-			}
+			// if (color == "red" || color == undefined) {
+			// 	xValue = -100000;
+			// }
 		}
 		return xValue;
 	})
@@ -263,7 +283,12 @@ function updateChart(cowChart, countySquares, csvData) {
 				return (height+1)*5;
 			}
 		})
-	
+
+	var chartTitle = d3.select("#title")
+	 	.attr("x", 20)
+	 	.attr("y", 40)
+	 	.attr("class", "chartTitle")
+	 	.text(expressed);	
 };
 
 //function to create a dropdown menu for attribute selection
@@ -277,10 +302,10 @@ function createDropdown (csvData) {
 		});
 
 	//add initial option
-	var titleOption = dropdown.append("option")
-		.attr("class", "titleOption")
-		.attr("disabled", "true")
-		.text("Select Attribute");
+	// var titleOption = dropdown.append("option")
+	// 	.attr("class", "titleOption")
+	// 	.attr("disabled", "true")
+	// 	.text("Select Attribute");
 
 	//add addtibute name options
 	var attrOptions = dropdown.selectAll("attrOptions")
@@ -296,19 +321,63 @@ function changeAttribute(attribute, csvData) {
 	//change the expressed attribute
 	expressed = attribute;
 
-	//recreate teh color scale
+	//recreate the color scale
 	var colorScale = makeColorScale(csvData);
-	
 
 	//recolor enumeration units
 	var counties = d3.selectAll(".counties")
+		.transition()//add animation
+		.duration(250)
 		.style("fill", function(d) {
 			return choropleth(d.properties, colorScale)
 		});
 
-	var cowChart = d3.selectAll(".chart");
+	var cowChart = d3.selectAll(".chart")
+		.transition()//add animation
+		.delay(function(d, i){
+			return i*20
+		})
+		.duration(500);
+
+	//PROBLEM!!
+	updateChart(cowChart, csvData.length, csvData);
 	
 };
+
+//function to highlight enumeration units and squares
+// function highlight(props){
+// 	//change fill
+// 	var selected = d3.selectAll("." + props.COUNTY_FIP)
+// 		.style("fill", "yellow");
+// };
+
+// function dehighlight(props){
+// 	var selected = d3.selectAll("." + props.COUNTY_FIP)
+// 		.style({
+// 			"fill": function(){
+// 				return getStyle(this, "fill")
+// 			}
+// 		});
+
+// 	function getStyle(element, styleName){
+// 		var styleText = d3.select(element)
+// 			.select("desc")
+// 			.text();
+
+// 		var styleObject = JSON.parse(styleText);
+
+// 		return styleObject[styleName];
+// 	};
+//};
+
+
+
+
+
+
+
+
+
 
 
 	// var img = g.append("svg:image")

@@ -1,4 +1,4 @@
-ID,Name,COUNTY_FIP,Percent Of Farms With Milk Cows,How Much Each Cow Is Worth_thousandsofdollarseachcowproducesinayear,Cows Per Capita,Active Selling Dairy Farms Per Capita,Total Farms Per Capita
+ID,Name,COUNTY_FIP,Percent Of Farms With Milk Cows,Yearly Production Per Cow (Thousands $),Cows Per Capita,Active Selling Dairy Farms Per Capita,Total Farms Per Capita
 0,"Adams County, Wisconsin",1,5.111821086,3.474940334,0.040099531,0.000765624,0.01497751
 1,"Ashland County, Wisconsin",3,8.021390374,3.758274824,0.123751009,0.000930925,0.011605536
 2,"Barron County, Wisconsin",5,21.10438729,3.877286907,0.517021926,0.006080816,0.028813042
