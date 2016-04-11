@@ -99,9 +99,22 @@ option {
 
 .header h1 {
   position: relative;
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 30px;
+  padding-top: 1px;
+  margin-top: 1px;
+  margin-bottom: 1px;
+
+
   
 }
 
+h2 {
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 20px;
+	margin-top: 1px;
+	margin-bottom: 1px;
+}
 
 
 

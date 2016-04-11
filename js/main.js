@@ -8,19 +8,11 @@
 
 //ON DYNAMIC LABELS
 
-//COLOR BOTTLES BASED ON CHOROPLETH COLOR?
-//TITLE
+
 //DELETE UN-USED CODE FOR FINAL!
 //ADD NAME TO MAP!
 //ADD DATA SOURCES
-//ADD PAGE TITLE AND OTHER INFO!!
 //COMMENT
-//WHAT YEARS???
-
-
-//domain-input
-//range-output
-
 
 //wrap everything in a self-exectuing anonymous function to move to local scope
 (function() {
