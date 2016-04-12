@@ -1,13 +1,7 @@
 /* Kristen Vincent's D3 coordinated viz main.js */
 
-//PROBLEMS!!!!!!!!!!
-//UPDATE CHART BASED ON SELECTED ATTRIBUTE
-//TITLES FOR CLASS BREAKS
-//HIGHLIGHTING
-//text to svg containing chart
-
-//ON DYNAMIC LABELS
-
+//labels
+//highlight return to normal
 
 //DELETE UN-USED CODE FOR FINAL!
 //ADD NAME TO MAP!
@@ -140,8 +134,8 @@ function setEnumerationUnits(wisconsinCounties, map, path, colorScale) {
 		})
 		.on("mouseout", function(d){
 			dehighlight(d.properties);
-		});
-
+		})
+		.on("mousemove", moveLabel);
 
 	var desc = counties.append("desc")
 		.text('{"fill": "yellow"}');
@@ -220,10 +214,13 @@ function setChart(csvData, colorScale) {
 	    .attr("width", 40)
 	    .attr("height", 40) 
 	    .on("mouseover", highlight)
-	    .on("mouseout", dehighlight);
+	    .on("mouseout", dehighlight)
+	    .on("mousemove", moveLabel);
 
 	 var desc = cowChart.append("desc")
-	 	.text('{"fill": "none"}');
+	 	.text(function(d) {
+	 		return choropleth(d, colorScale);
+	 	});
 
 	 updateChart(cowChart, csvData.length, csvData);
 };
@@ -260,9 +257,9 @@ function updateChart(cowChart, countySquares, csvData) {
 				xValue = colorArray[i].count*(40 + 1);
 				colorArray[i].count+=1;
 			}
-			// if (color == "red" || color == undefined) {
-			// 	xValue = -100000;
-			// }
+			if (color == "pink") {
+				xValue = -100000;
+			}
 		}
 		return xValue;
 	})
@@ -346,30 +343,85 @@ function changeAttribute(attribute, csvData) {
 //function to highlight enumeration units and squares
 function highlight(props){
 	//change fill
-	var selected = d3.selectAll("." + props.COUNTY_FIP)
-		.style("fill", "yellow");
-};
+    var selected = d3.selectAll("." + props.COUNTY_FIP)
+             .style("fill", "yellow"
+            //"stroke-width": "2"
+        );
+    setLabel(props);
+    
+
+ };
 
 function dehighlight(props){
 	var selected = d3.selectAll("." + props.COUNTY_FIP)
-		.style({
-			"fill": function(){
-				return getStyle(this, "fill")
-			}
-		});
+	
+	var fillColor = selected.select("desc").text();
+	selected.style("fill", fillColor);
 
-	function getStyle(element, styleName){
-		var styleText = d3.select(element)
-			.select("desc")
-			.text();
+	//remove label
+	d3.select(".infolabel")
+        .remove();
+};
 
-		var styleObject = JSON.parse(styleText);
+//function to move info label with mouse
+function moveLabel(){
+//get width of label
+    var labelWidth = d3.select(".infolabel")
+        .node()
+        .getBoundingClientRect()
+        .width;
 
-		return styleObject[styleName];
-	};
+    //use coordinates of mousemove event to set label coordinates
+    var x1 = d3.event.clientX + 10,
+        y1 = d3.event.clientY - 75,
+        x2 = d3.event.clientX - labelWidth - 10,
+        y2 = d3.event.clientY + 25;
+
+    //horizontal label coordinate, testing for overflow
+    var x = d3.event.clientX > window.innerWidth - labelWidth - 20 ? x2 : x1; 
+    //vertical label coordinate, testing for overflow
+    var y = d3.event.clientY < 75 ? y2 : y1; 
+
+    d3.select(".infolabel")
+        .style({
+            "left": x + "px",
+            "top": y + "px"
+        });
 };
 
 
+			
+
+	// function getStyle(element, styleName){
+	// 	var styleText = d3.select(element)
+	// 		.select("desc")
+	// 		.text();
+
+	// 	var styleObject = JSON.parse(styleText);
+
+	// 	return styleObject[styleName];
+	// };
+
+
+//function to create dynamic label
+function setLabel(props){
+    //label content
+    var labelAttribute = "<h1>" + Math.round(props[expressed]*100)/100+
+        "</h1><b>" + expressed + "</b>";
+
+    //create info label div
+    var infolabel = d3.select("body")
+        .append("div")
+        .attr({
+            "class": "infolabel",
+            "id": props.COUNTY_FIP + "_label"
+        })
+        .html(labelAttribute);
+
+    var regionName = infolabel.append("div")
+        .attr("class", "labelname")
+        .html(props.name);
+};
 
 
 
