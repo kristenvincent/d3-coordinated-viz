@@ -20,15 +20,20 @@
 //pseudo-global variables
 var attrArray = ["Percent Of Farms With Milk Cows", "Yearly Production Per Cow (Thousands $)", "Cows Per Capita", "Active Selling Dairy Farms Per Capita", "Total Farms Per Capita"]; //list of attributes
 var expressed = attrArray[0]; //initial attribute
-var colorScale;
-//var colorClasses = [];
-var colorClasses = [
-		"#f7f7f7",
-		"#cccccc",
-		"#969696",
-		"#636363",
-		"#252525"
-	];
+	//chart frame dimensions
+var width = window.innerWidth * 0.50,
+	height = 455;
+	leftPadding = 25,
+    rightPadding = 2,
+    topBottomPadding = 5,
+    chartInnerWidth = width - leftPadding - rightPadding,
+    chartInnerHeight = height - topBottomPadding * 2,
+    translate = "translate(" + leftPadding + "," + topBottomPadding + ")";
+
+//create a scale to size bars proportionally to frame
+var yScale = d3.scale.linear()
+	.range([0, height])
+	.domain([0, 45]);
 
 //begin script when window loads
 window.onload = setMap();
@@ -45,11 +50,6 @@ function setMap() {
 		.attr("class", "map")
 		.attr("width", width)
 		.attr("height", height);
-	
-	// map.append("svg:image")
-	// 	.attr("xlink:href", "assets/cow2-01.svg")
-	// 	.attr("x", 228)
-	//     .attr("y",53);
 
 	//create projection
 	var projection = d3.geo.albers()
@@ -89,7 +89,6 @@ function setMap() {
 
 		//add dropdown to map
 		createDropdown(csvData);
-
 
 	};
 }; //end of setMap()
@@ -135,12 +134,12 @@ function setEnumerationUnits(wisconsinCounties, map, path, colorScale) {
 		.style("fill", function(d){
 			return choropleth(d.properties, colorScale);
 		});
-		// .on("mouseover", function(d){
-		// 	highlight(d.properties);
-		// });
-		// .on("mouseout", function(d){
-		// 	dehighlight(d.properties);
-		// });
+		.on("mouseover", function(d){
+			highlight(d.properties);
+		});
+		.on("mouseout", function(d){
+			dehighlight(d.properties);
+		});
 
 	var desc = counties.append("desc")
 		.text('{"fill": "yellow"}');
@@ -190,101 +189,103 @@ function choropleth(props, colorScale) {
 
 //function to create coordinated bar graph
 function setChart(csvData, colorScale) {
-	//chart frame dimensions
-	var width = window.innerWidth * 0.50,
-		height = 455;
-
-	var chart = d3.select("#chartBottles").append("svg")
+	var chart = d3.select("body")
+		.append("svg")
 		.attr("width", width)
 		.attr("height", height)
 		.attr("class", "chart");
 
+	//create a rectangle for chart background fill
+    var chartBackground = chart.append("rect")
+        .attr("class", "chartBackground")
+        .attr("width", chartInnerWidth)
+        .attr("height", chartInnerHeight)
+        .attr("transform", translate);
 
-	// var g = svg.append("g");
-
-	//append image to the chart, one cow image per county
-	var cowChart = chart.selectAll(".chart")
+	//set bars for each county
+	var bars = chart.selectAll(".bar")
 		.data(csvData)
 		.enter()
 		.append("rect")
-		//.append("svg:image")
-		//.attr("xlink:href", "assets/bottle-01.svg")
-		//.attr("width", 200)
-	 	//.attr("height", 200)
-	    .attr("x", 228)
-	    .attr("y",53)
-	    .attr("class", function (d) {
-	    	return "cow " + d.COUNTY_FIP;
-	    })
-	    .attr("width", 40)
-	    .attr("height", 40) 
-	    //.on("mouseover", highlight)
-	    //.on("mouseout", dehighlight);
+		.sort(function(a, b){
+			return b[expressed]-a[expressed]
+		})
+		.attr("class", function(d) {
+			return "bars " + d.COUNTY_FIP;
+		})
+		.attr("width", chartInnerWidth / csvData.length - 1);
 
-	 var desc = cowChart.append("desc")
+	//annotate bars with attribute value text
+	var numbers = chart.selectAll(".numbers")
+		.data(csvData)
+		.enter()
+		.append("text")
+		.sort(function(a, b) {
+			return b[expressed]-a[expressed]
+		})
+		.attr("class", function(d) {
+			return "numbers " + d.COUNTY_FIP;
+		})
+		.attr("text-anchor", "middle")
+		.attr("x", function(d, i) {
+			var fraction = width / csvData.length;
+			return i * fraction + (fraction - 1) / 2;
+		})
+		.attr("y", function(d) {
+			return height - yScale(parseFloat(d[expressed])) + 15;
+		})
+		.text(function(d){
+			return Math.round(d[expressed]*100)/100
+		})
+
+	 //create vertical axis generator	
+	 var yAxis = d3.svg.axis()
+	 	.scale(yScale)
+	 	.orient("left");
+
+	//place axis
+	var axis = chart.append("g")
+		.attr("class", "axis")
+		.attr("transform", translate)
+		.call(yAxis);
+
+	//create frame for chart border
+	var chartFrame = chart.append("rect")
+        .attr("class", "chartFrame")
+        .attr("width", chartInnerWidth)
+        .attr("height", chartInnerHeight)
+        .attr("transform", translate);
+
+	var desc = chart.append("desc")
 	 	.text('{"fill": "none"}');
 
-	 updateChart(cowChart, csvData.length, csvData);
+	 updateChart(bars, csvData.length, colorScale);
 };
 
 //function to update chart 
-function updateChart(cowChart, countySquares, csvData) {
-	colorScale = makeColorScale(csvData);
-	var xValue = 0;
-	var yValue = 0;
-	var colorArray = [];
-	var height = 40;
-	var width = 40;
+function updateChart(bars, n, colorScale) {
+	//position bars
+    bars.attr("x", function(d, i){
+            return i * (chartInnerWidth / n) + leftPadding;
+        })
+        //size/resize bars
+        .attr("height", function(d, i){
+            return 463 - yScale(parseFloat(d[expressed]));
+        })
+        .attr("y", function(d, i){
+            return yScale(parseFloat(d[expressed])) + topBottomPadding;
+        })
+        //color/recolor bars
+        .style("fill", function(d){
+            return choropleth(d, colorScale);
+        });
 
-	for (i = 0; i < colorClasses.length; i++) {
-		var colorObject = {"color": colorClasses[i], "count":0};
-		colorArray.push(colorObject);
-	}
-
-
-	var countyColor = cowChart.style("fill", function (d) {
-			return choropleth(d, colorScale);
-	})
-	.attr("x", function (d, i) {
-		color = choropleth (d, colorScale);
-		//loop to arrange chart horizontally
-		for (i = 0; i < colorArray.length; i++) {
-			if(colorArray[i].color == color) {
-				xValue = colorArray[i].count*(40 + 1);
-				colorArray[i].count+=1;
-			}
-			// if (color == "red" || color == undefined) {
-			// 	xValue = -100000;
-			// }
-		}
-		return xValue;
-	})
-	.attr("y", function(d, i) {
-		color = choropleth(d, colorScale);
-		if (color == colorClasses[0]) {
-				return 0
-			} else if (color == colorClasses[1]) {
-				return (height+1);
-			} else if (color == colorClasses[2]) {
-				return (height+1)*2;
-			} else if (color == colorClasses[3]) {
-				return (height+1)*3;
-			} else if (color == colorClasses[4]) {
-				return (height+1)*4;
-			} else if (color == colorClasses[5]) {
-				return (height+1)*5;
-			}
-		})
-
-	var chartTitle = d3.select("#title")
-	 	.attr("x", 20)
-	 	.attr("y", 40)
-	 	.attr("class", "chartTitle")
-	 	.text(expressed);	
+	var chartTitle = d3.select(".chartTitle")
+	 	.text(expressed);
 };
 
 //function to create a dropdown menu for attribute selection
-function createDropdown (csvData) {
+function createDropdown(csvData) {
 	//add select element
 	var dropdown = d3.select("body")
 		.append("select")
@@ -293,18 +294,12 @@ function createDropdown (csvData) {
 			changeAttribute(this.value, csvData)
 		});
 
-	//add initial option
-	// var titleOption = dropdown.append("option")
-	// 	.attr("class", "titleOption")
-	// 	.attr("disabled", "true")
-	// 	.text("Select Attribute");
-
 	//add addtibute name options
 	var attrOptions = dropdown.selectAll("attrOptions")
 		.data(attrArray)
 		.enter()
 		.append("option")
-		.attr("value", function (d) {return d})
+		.attr("value", function(d) {return d})
 		.text(function(d) {return d});
 };
 
@@ -324,7 +319,12 @@ function changeAttribute(attribute, csvData) {
 			return choropleth(d.properties, colorScale)
 		});
 
-	var cowChart = d3.selectAll(".chart")
+	//re-sort, resize, and recolor bars
+    var bars = d3.selectAll(".bar")
+        //re-sort bars
+        .sort(function(a, b){
+            return b[expressed] - a[expressed];
+        })
 		.transition()//add animation
 		.delay(function(d, i){
 			return i*20
@@ -332,16 +332,16 @@ function changeAttribute(attribute, csvData) {
 		.duration(500);
 
 	//PROBLEM!!
-	updateChart(cowChart, csvData.length, csvData);
+	updateChart(bars, csvData.length, colorScale);
 	
 };
 
 //function to highlight enumeration units and squares
-// function highlight(props){
-// 	//change fill
-// 	var selected = d3.selectAll("." + props.COUNTY_FIP)
-// 		.style("fill", "yellow");
-// };
+function highlight(props){
+	//change fill
+	var selected = d3.selectAll("." + props.COUNTY_FIP)
+		.style("fill", "yellow");
+};
 
 // function dehighlight(props){
 // 	var selected = d3.selectAll("." + props.COUNTY_FIP)
@@ -361,86 +361,6 @@ function changeAttribute(attribute, csvData) {
 // 		return styleObject[styleName];
 // 	};
 //};
-
-
-
-
-
-
-
-
-
-
-
-	// var img = g.append("svg:image")
-	// 	.attr("xlink:href", "assets/cow-01.svg")
-	// 	.attr("width", 200)
-	//     .attr("height", 200)
-	//     .attr("x", 228)
-	//     .attr("y",53);
-
-	
-	  
-	//create a second svg element to hold the bar chart
-// 	var chart = d3.select("body")
-// 		.append("svg")
-// 		.attr("width", chartWidth)
-// 		.attr("height", chartHeight)
-// 		.attr("class", "chart");
-
-// 	//create a scale to size bars proportionally to frame
-// 	var yScale = d3.scale.linear()
-// 		.range([0, chartHeight])
-// 		.domain([0, 45]);
-
-// 	//set bars for each county
-// 	var bars = chart.selectAll(".bars")
-// 		.data(csvData)
-// 		.enter()
-// 		.append("rect")
-// 		.sort(function(a, b){
-// 			return b[expressed]-a[expressed]
-// 		})
-// 		.attr("class", function(d) {
-// 			return "bars " + d.COUNTY_FIP;
-// 		})
-// 		.attr("width", chartWidth / csvData.length - 1)
-// 		.attr("x", function(d, i) {
-// 			return i * (chartWidth / csvData.length);
-// 		})
-// 		.attr("height", function(d) {
-// 			return yScale(parseFloat(d[expressed]));
-// 		})
-// 		.attr("y", function(d) {
-// 			return chartHeight - yScale(parseFloat(d[expressed]));
-// 		})
-// 		.style ("fill", function(d) {
-// 			return choropleth(d, colorScale);
-// 		});
-
-// 	//annotate bars with attribute value text
-// 	var numbers = chart.selectAll(".numbers")
-// 		.data(csvData)
-// 		.enter()
-// 		.append("text")
-// 		.sort(function(a, b) {
-// 			return b[expressed]-a[expressed]
-// 		})
-// 		.attr("class", function(d) {
-// 			return "numbers " + d.COUNTY_FIP;
-// 		})
-// 		.attr("text-anchor", "middle")
-// 		.attr("x", function(d, i) {
-// 			var fraction = chartWidth / csvData.length;
-// 			return i * fraction + (fraction - 1) / 2;
-// 		})
-// 		.attr("y", function(d) {
-// 			return chartHeight - yScale(parseFloat(d[expressed])) + 15;
-// 		})
-// 		.text(function(d){
-// 			return Math.round(d[expressed]*100)/100
-// 		})
-	
 
 
 })(); //end of main.js
