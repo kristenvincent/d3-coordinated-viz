@@ -1,7 +1,7 @@
 /* Kristen Vincent's D3 coordinated viz main.js */
 
 //labels
-//highlight return to normal
+
 
 //DELETE UN-USED CODE FOR FINAL!
 //ADD NAME TO MAP!
@@ -30,7 +30,7 @@ window.onload = setMap();
 //set up choropleth map
 function setMap() {
 	//map frame dimensions
-	var width = window.innerWidth * 0.425,
+	var width = window.innerWidth * 0.42,
 		height = 600;
 
 	//create new svg container for the map
@@ -138,7 +138,8 @@ function setEnumerationUnits(wisconsinCounties, map, path, colorScale) {
 		.on("mousemove", moveLabel);
 
 	var desc = counties.append("desc")
-		.text('{"fill": "yellow"}');
+        .text('{"stroke": "#000", "stroke-width": "0.5px"}');
+
 }; //end of setEnumerationUnits function
 
 //function to create color scale generator
@@ -176,9 +177,9 @@ function choropleth(props, colorScale) {
 	if (val) {
 		return colorScale(val);
 	} else if (val == "No data") {
-		return "pink";
+		return "#F4DAA6";
 	} else {
-		return "pink";
+		return "#F4DAA6";
 	}
 	
 };
@@ -187,7 +188,12 @@ function choropleth(props, colorScale) {
 function setChart(csvData, colorScale) {
 	//chart frame dimensions
 	var width = window.innerWidth * 0.50,
-		height = 455;
+		height = 400;
+
+	// var notes = d3.select("#notes").append("svg")
+	// 	.attr("width", width)
+	// 	.attr("height", height)
+	// 	.attr("class", "notes")
 
 	var chart = d3.select("#chartBottles").append("svg")
 		.attr("width", width)
@@ -217,10 +223,8 @@ function setChart(csvData, colorScale) {
 	    .on("mouseout", dehighlight)
 	    .on("mousemove", moveLabel);
 
-	 var desc = cowChart.append("desc")
-	 	.text(function(d) {
-	 		return choropleth(d, colorScale);
-	 	});
+   var desc = cowChart.append("desc")
+        .text('{"stroke": "none", "stroke-width": "0px"}');
 
 	 updateChart(cowChart, csvData.length, csvData);
 };
@@ -257,7 +261,7 @@ function updateChart(cowChart, countySquares, csvData) {
 				xValue = colorArray[i].count*(40 + 1);
 				colorArray[i].count+=1;
 			}
-			if (color == "pink") {
+			if (color == "#F4DAA6") {
 				xValue = -100000;
 			}
 		}
@@ -327,6 +331,7 @@ function changeAttribute(attribute, csvData) {
 		.style("fill", function(d) {
 			return choropleth(d.properties, colorScale)
 		});
+		
 
 	// var cowChart = d3.selectAll(".chart")
 	// 	.transition()//add animation
@@ -335,34 +340,51 @@ function changeAttribute(attribute, csvData) {
 	// 	})
 	// 	.duration(500);
 
-	//PROBLEM!!
+	
 	updateChart(cowChart, csvData.length, csvData);
 	
 };
 
 //function to highlight enumeration units and squares
 function highlight(props){
-	//change fill
+    //change stroke
     var selected = d3.selectAll("." + props.COUNTY_FIP)
-             .style("fill", "yellow"
-            //"stroke-width": "2"
-        );
+        .style({
+            "stroke": "#F716C8",
+            "stroke-width": "2"
+        });
     setLabel(props);
-    
-
  };
 
+//function to reset the element style on mouseout
 function dehighlight(props){
-	var selected = d3.selectAll("." + props.COUNTY_FIP)
-	
-	var fillColor = selected.select("desc").text();
-	selected.style("fill", fillColor);
+    var selected = d3.selectAll("." + props.COUNTY_FIP)
+        .style({
+            "stroke": function(){
+                return getStyle(this, "stroke")
+            },
+            "stroke-width": function(){
+                return getStyle(this, "stroke-width")
+            }
+        });
+
+    function getStyle(element, styleName){
+        var styleText = d3.select(element)
+            .select("desc")
+            .text();
+
+        var styleObject = JSON.parse(styleText);
+
+        return styleObject[styleName];
+    };
 
 	//remove label
 	d3.select(".infolabel")
         .remove();
+
 };
 
+ 
 //function to move info label with mouse
 function moveLabel(){
 //get width of label

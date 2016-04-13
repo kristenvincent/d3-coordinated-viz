@@ -4,7 +4,7 @@
 	fill: white;
 	stroke: black;
 	stroke-width: 1.5px;
-	background-color: white;
+	background-color: #FFCFDE;
 	border: medium solid #999;
 	margin: 10px;
 	height: 530px;
@@ -20,27 +20,30 @@
 	font-family: 'Ubuntu', sans-serif;
 	width: 600px;
 	font-weight: bold;
-	font-size: 1.5em;
+	font-size: 20px;
 	font-color: white;
+	background-color: #FFCFDE;
 }
 
 .chart {
 	float: right;
 	margin: 7px 20px 0 0;
 	position: absolute;
-	background-color: white;
+	background-color: #FFCFDE;
 	border: medium solid #999;
 	float: right;
 	margin: 0px;
 	padding: 1px;
+
+
 }
 
 .chartBackground {
-    fill: pink;
+    color: pink;
 }
 
 .chartFrame {
-	fill: none;
+	fill: pink;
 	stroke: #999;
     stroke-width: 3px;
     shape-rendering: crispEdges
@@ -69,16 +72,13 @@
 	font-weight: bold;
 	padding: 2px;
 	border: 1px solid #999;
-	box-shadow: 2px 2px 4px #999
+	box-shadow: 2px 2px 4px #999;
+	margin-top: 4px;
 }
 
 option {
 	font-weight: normal;
 }
-
-
-
-
 
 
 #chartContainer {
@@ -106,7 +106,22 @@ option {
 		
 }
 
+#notes {
+	background-color: #FFCFDE;
+	height: 40px;
+	width: 685px;
+	border-width: 2px;
+	border: medium solid #999;
+	text-align: center;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	font-family: 'Ubuntu', sans-serif;
+	position: absolute;
+	transform: translate(0px, 206px);
+	font-size: 16px;
+	color: #444344;
 
+}
 
 .header {
 	color: white;
@@ -119,6 +134,7 @@ option {
 	margin-left: 10px;
 	text-align: center;
 	font-family: 'Ubuntu', sans-serif;
+	border: medium solid #999
 }
 
 #cow1 {	
@@ -143,15 +159,12 @@ option {
   font-size: 30px;
   padding-top: 1px;
   margin-top: 1px;
-  margin-bottom: 1px;
-
-
-  
+  margin-bottom: 1px;  
 }
 
 h2 {
 	font-family: 'Ubuntu', sans-serif;
-	font-size: 20px;
+	font-size: 25px;
 	margin-top: 1px;
 	margin-bottom: 1px;
 }
@@ -160,19 +173,23 @@ h2 {
 .infolabel {
 	font-family: 'Ubuntu', sans-serif;
     position: absolute;
-    height: 50px;
+    height: 30px;
     min-width: 100px;
-    color: #fff;
-    background-color: #000;
-    border: solid thin #fff;
+    color: white;
+    background-color: black;
+    border: solid thin white;
     padding: 5px 5px;
     padding-bottom: 1px;
     top: -75px;
+    font-size: 16px;
 }
 
 .infolabel h1 {
+	font-family: 'Ubuntu', sans-serif;
     margin: 0 20px 0 0;
     padding: 0;
     display: inline-block;
     line-height: 1em;
+    font-size: 18px;
+    margin-bottom: 1px;
 }
