@@ -193,18 +193,6 @@ h2 {
     font-size: 18px;
     margin-bottom: 1px;
     
+    
 }
 
-.chartLabels {
-    color: black;
-    font-family: 'Ubuntu', sans-serif;
-    line-height: 160%;
-    height: 205px;
-    position: relative;
-    border: medium solid #999;
-    float: right;
-    text-align: right;
-    width: 60px;
-    font-size:16px;
-    transform: translate(-8px, -477px);
-}
