@@ -199,6 +199,7 @@ function setChart(csvData, colorScale) {
    var desc = cowChart.append("desc")
         .text('{"stroke": "none", "stroke-width": "0px"}');
 
+
 	 updateChart(cowChart, csvData.length, csvData);
 };
 
@@ -262,6 +263,7 @@ function updateChart(cowChart, countySquares, csvData) {
 	 	.attr("y", 40)
 	 	.attr("class", "chartTitle")
 	 	.text(expressed);	
+
 };
 
 //function to create a dropdown menu for attribute selection
@@ -373,8 +375,9 @@ function moveLabel(){
 function setLabel(props){
     //label content
 
-    var labelAttribute = "<h1>" + Math.round(props[expressed]*100)/100+
-        "</h1><b>" + expressed + "</b>";
+    var labelAttribute = "<h1>" + Math.round(props[expressed]*1000)/1000+ "    :" + "   " +
+         props.COUNTY_NAM + " County" + "</h1>";
+
 
     //create info label div
     var infolabel = d3.select("body")
@@ -389,7 +392,7 @@ function setLabel(props){
         .attr("class", "labelname")
         .html(props.name);
 
-    console.log(props);
+   
 };
 
 })(); //end of main.js
