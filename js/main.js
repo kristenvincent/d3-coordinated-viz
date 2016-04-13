@@ -1,13 +1,5 @@
 /* Kristen Vincent's D3 coordinated viz main.js */
 
-//labels
-
-
-//DELETE UN-USED CODE FOR FINAL!
-//ADD NAME TO MAP!
-//ADD DATA SOURCES
-//COMMENT
-
 //wrap everything in a self-exectuing anonymous function to move to local scope
 (function() {
 
@@ -30,7 +22,7 @@ window.onload = setMap();
 //set up choropleth map
 function setMap() {
 	//map frame dimensions
-	var width = window.innerWidth * 0.42,
+	var width = window.innerWidth * 0.425,
 		height = 600;
 
 	//create new svg container for the map
@@ -40,11 +32,6 @@ function setMap() {
 		.attr("width", width)
 		.attr("height", height);
 	
-	// map.append("svg:image")
-	// 	.attr("xlink:href", "assets/cow2-01.svg")
-	// 	.attr("x", 228)
-	//     .attr("y",53);
-
 	//create projection
 	var projection = d3.geo.albers()
 		.center([0, 44.60])
@@ -65,6 +52,7 @@ function setMap() {
 		.defer(d3.json, "data/wicountyboundaries.topojson")//load county boundaries
 		.await(callback);
 
+	//function to call in data
 	function callback (error, csvData, countyBoundaries) {
 		//translate countyBoundaries topoJSON
 		var wisconsinCounties = topojson.feature(countyBoundaries, countyBoundaries.objects.wicountyboundaries).features;
@@ -83,8 +71,6 @@ function setMap() {
 
 		//add dropdown to map
 		createDropdown(csvData);
-
-
 	};
 }; //end of setMap()
 
@@ -180,38 +166,25 @@ function choropleth(props, colorScale) {
 		return "#F4DAA6";
 	} else {
 		return "#F4DAA6";
-	}
-	
+	}	
 };
 
 //function to create coordinated bar graph
 function setChart(csvData, colorScale) {
 	//chart frame dimensions
-	var width = window.innerWidth * 0.50,
+	var width = window.innerWidth * 0.4985,
 		height = 400;
-
-	// var notes = d3.select("#notes").append("svg")
-	// 	.attr("width", width)
-	// 	.attr("height", height)
-	// 	.attr("class", "notes")
 
 	var chart = d3.select("#chartBottles").append("svg")
 		.attr("width", width)
 		.attr("height", height)
 		.attr("class", "chart");
 
-
-	// var g = svg.append("g");
-
 	//append image to the chart, one cow image per county
 	cowChart = chart.selectAll(".chart")
 		.data(csvData)
 		.enter()
 		.append("rect")
-		//.append("svg:image")
-		//.attr("xlink:href", "assets/bottle-01.svg")
-		//.attr("width", 200)
-	 	//.attr("height", 200)
 	    .attr("x", 228)
 	    .attr("y",53)
 	    .attr("class", function (d) {
@@ -242,7 +215,6 @@ function updateChart(cowChart, countySquares, csvData) {
 		var colorObject = {"color": colorClasses[i], "count":0};
 		colorArray.push(colorObject);
 	}
-
 
 	var countyColor = cowChart
 		.transition()//add animation
@@ -284,6 +256,7 @@ function updateChart(cowChart, countySquares, csvData) {
 			}
 		})
 
+	//make chart title dynamic
 	var chartTitle = d3.select("#title")
 	 	.attr("x", 20)
 	 	.attr("y", 40)
@@ -300,12 +273,6 @@ function createDropdown (csvData) {
 		.on("change", function () {
 			changeAttribute(this.value, csvData)
 		});
-
-	//add initial option
-	// var titleOption = dropdown.append("option")
-	// 	.attr("class", "titleOption")
-	// 	.attr("disabled", "true")
-	// 	.text("Select Attribute");
 
 	//add addtibute name options
 	var attrOptions = dropdown.selectAll("attrOptions")
@@ -331,16 +298,7 @@ function changeAttribute(attribute, csvData) {
 		.style("fill", function(d) {
 			return choropleth(d.properties, colorScale)
 		});
-		
 
-	// var cowChart = d3.selectAll(".chart")
-	// 	.transition()//add animation
-	// 	.delay(function(d, i){
-	// 		return i*20
-	// 	})
-	// 	.duration(500);
-
-	
 	updateChart(cowChart, csvData.length, csvData);
 	
 };
@@ -411,23 +369,10 @@ function moveLabel(){
         });
 };
 
-
-			
-
-	// function getStyle(element, styleName){
-	// 	var styleText = d3.select(element)
-	// 		.select("desc")
-	// 		.text();
-
-	// 	var styleObject = JSON.parse(styleText);
-
-	// 	return styleObject[styleName];
-	// };
-
-
 //function to create dynamic label
 function setLabel(props){
     //label content
+
     var labelAttribute = "<h1>" + Math.round(props[expressed]*100)/100+
         "</h1><b>" + expressed + "</b>";
 
@@ -443,85 +388,8 @@ function setLabel(props){
     var regionName = infolabel.append("div")
         .attr("class", "labelname")
         .html(props.name);
+
+    console.log(props);
 };
-
-
-
-
-
-
-
-
-
-	// var img = g.append("svg:image")
-	// 	.attr("xlink:href", "assets/cow-01.svg")
-	// 	.attr("width", 200)
-	//     .attr("height", 200)
-	//     .attr("x", 228)
-	//     .attr("y",53);
-
-	
-	  
-	//create a second svg element to hold the bar chart
-// 	var chart = d3.select("body")
-// 		.append("svg")
-// 		.attr("width", chartWidth)
-// 		.attr("height", chartHeight)
-// 		.attr("class", "chart");
-
-// 	//create a scale to size bars proportionally to frame
-// 	var yScale = d3.scale.linear()
-// 		.range([0, chartHeight])
-// 		.domain([0, 45]);
-
-// 	//set bars for each county
-// 	var bars = chart.selectAll(".bars")
-// 		.data(csvData)
-// 		.enter()
-// 		.append("rect")
-// 		.sort(function(a, b){
-// 			return b[expressed]-a[expressed]
-// 		})
-// 		.attr("class", function(d) {
-// 			return "bars " + d.COUNTY_FIP;
-// 		})
-// 		.attr("width", chartWidth / csvData.length - 1)
-// 		.attr("x", function(d, i) {
-// 			return i * (chartWidth / csvData.length);
-// 		})
-// 		.attr("height", function(d) {
-// 			return yScale(parseFloat(d[expressed]));
-// 		})
-// 		.attr("y", function(d) {
-// 			return chartHeight - yScale(parseFloat(d[expressed]));
-// 		})
-// 		.style ("fill", function(d) {
-// 			return choropleth(d, colorScale);
-// 		});
-
-// 	//annotate bars with attribute value text
-// 	var numbers = chart.selectAll(".numbers")
-// 		.data(csvData)
-// 		.enter()
-// 		.append("text")
-// 		.sort(function(a, b) {
-// 			return b[expressed]-a[expressed]
-// 		})
-// 		.attr("class", function(d) {
-// 			return "numbers " + d.COUNTY_FIP;
-// 		})
-// 		.attr("text-anchor", "middle")
-// 		.attr("x", function(d, i) {
-// 			var fraction = chartWidth / csvData.length;
-// 			return i * fraction + (fraction - 1) / 2;
-// 		})
-// 		.attr("y", function(d) {
-// 			return chartHeight - yScale(parseFloat(d[expressed])) + 15;
-// 		})
-// 		.text(function(d){
-// 			return Math.round(d[expressed]*100)/100
-// 		})
-	
-
 
 })(); //end of main.js
