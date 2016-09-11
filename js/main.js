@@ -31,7 +31,7 @@ function setMap() {
 		.attr("class", "map")
 		.attr("width", width)
 		.attr("height", height);
-	
+
 	//create projection
 	var projection = d3.geo.albers()
 		.center([0, 44.60])
@@ -117,6 +117,12 @@ function setEnumerationUnits(wisconsinCounties, map, path, colorScale) {
 		})
 		.on("mouseover", function(d){
 			highlight(d.properties);
+			map.selectAll("path").sort(function (a, b) {
+                // a is not the mouseover element, send "a" to the back
+                if (a != d) return -1;
+                // a is the mouseover element, bring "a" to the front
+                else return 1;
+            });
 		})
 		.on("mouseout", function(d){
 			dehighlight(d.properties);
@@ -166,7 +172,7 @@ function choropleth(props, colorScale) {
 		return "#F4DAA6";
 	} else {
 		return "#F4DAA6";
-	}	
+	}
 };
 
 //function to create coordinated bar graph
@@ -185,16 +191,16 @@ function setChart(csvData, colorScale) {
 		.data(csvData)
 		.enter()
 		.append("rect")
-	    .attr("x", 228)
-	    .attr("y",53)
-	    .attr("class", function (d) {
-	    	return "cow " + d.COUNTY_FIP;
-	    })
-	    .attr("width", 40)
-	    .attr("height", 40) 
-	    .on("mouseover", highlight)
-	    .on("mouseout", dehighlight)
-	    .on("mousemove", moveLabel);
+	  .attr("x", 228)
+	  .attr("y",53)
+	  .attr("class", function (d) {
+	    return "cow " + d.COUNTY_FIP;
+	  })
+	  .attr("width", 40)
+	  .attr("height", 40)
+	  .on("mouseover", highlight)
+	  .on("mouseout", dehighlight)
+	  .on("mousemove", moveLabel);
 
    var desc = cowChart.append("desc")
         .text('{"stroke": "none", "stroke-width": "0px"}');
@@ -203,7 +209,7 @@ function setChart(csvData, colorScale) {
 	 updateChart(cowChart, csvData.length, csvData);
 };
 
-//function to update chart 
+//function to update chart
 function updateChart(cowChart, countySquares, csvData) {
 	colorScale = makeColorScale(csvData);
 	var xValue = 0;
@@ -262,7 +268,7 @@ function updateChart(cowChart, countySquares, csvData) {
 	 	.attr("x", 20)
 	 	.attr("y", 40)
 	 	.attr("class", "chartTitle")
-	 	.text(expressed);	
+	 	.text(expressed);
 
 };
 
@@ -302,7 +308,7 @@ function changeAttribute(attribute, csvData) {
 		});
 
 	updateChart(cowChart, csvData.length, csvData);
-	
+
 };
 
 //function to highlight enumeration units and squares
@@ -344,7 +350,7 @@ function dehighlight(props){
 
 };
 
- 
+
 //function to move info label with mouse
 function moveLabel(){
 //get width of label
@@ -360,9 +366,9 @@ function moveLabel(){
         y2 = d3.event.clientY + 25;
 
     //horizontal label coordinate, testing for overflow
-    var x = d3.event.clientX > window.innerWidth - labelWidth - 20 ? x2 : x1; 
+    var x = d3.event.clientX > window.innerWidth - labelWidth - 20 ? x2 : x1;
     //vertical label coordinate, testing for overflow
-    var y = d3.event.clientY < 75 ? y2 : y1; 
+    var y = d3.event.clientY < 75 ? y2 : y1;
 
     d3.select(".infolabel")
         .style({
@@ -374,11 +380,16 @@ function moveLabel(){
 //function to create dynamic label
 function setLabel(props){
     //label content
+		labelAttribute = props[expressed];
+    // var labelAttribute = "<h1>" + Math.round(props[expressed]*1000)/1000+ "    :" + "   " +
+    //      props.COUNTY_NAM + " County" + "</h1>";
 
-    var labelAttribute = "<h1>" + Math.round(props[expressed]*1000)/1000+ "    :" + "   " +
-         props.COUNTY_NAM + " County" + "</h1>";
-
-
+	  if (Boolean(props[expressed]) == true) {
+		  	labelAttribute = "<h1>" + Math.round(props[expressed]*1000)/1000+ "    :" + "   " +
+		         props.COUNTY_NAM + " County" + "</h1>";
+		    } else {
+		    labelAttribute = "<h1>" + "No Data"  + ":" + " " + props.COUNTY_NAM + " County" + "</h1>";
+		 };
     //create info label div
     var infolabel = d3.select("body")
         .append("div")
@@ -392,7 +403,7 @@ function setLabel(props){
         .attr("class", "labelname")
         .html(props.name);
 
-   
+
 };
 
 })(); //end of main.js
